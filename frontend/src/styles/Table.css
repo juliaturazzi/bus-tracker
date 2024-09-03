@@ -1,0 +1,28 @@
+.table-container {
+    display: grid;
+    justify-items: center;
+    padding: 20px;
+  }
+  
+  .data-table {
+    color: white;
+    border: 2px solid white;
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+  }
+  
+  .data-table th, .data-table td {
+    padding: 10px;
+    border: 1px solid white;
+  }
+  
+  .data-table thead {
+    font-size: 22px;
+  }
+  
+  .data-table tbody tr {
+    font-size: 20px;
+  }
+  

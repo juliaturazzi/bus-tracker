@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+celery
+traveltimepy
+pandas
+mysql-connector-python
+coverage
+pytest
