@@ -6,7 +6,6 @@ from temp.utils.get_buses_data import get_buses_data
 from temp.utils.get_travel_time import get_travel_time
 from fastapi.middleware.cors import CORSMiddleware
 
-DEBUG = 1
 
 # initialize FastAPI app
 app = FastAPI()

@@ -3,7 +3,7 @@ import mysql.connector
 
 class BusStopDatabase:
     def __init__(self):
-        self.host = "localhost"
+        self.host = "db"
         self.user = "bustracker"
         self.password = "bustracker123"
         self.database = "bustracker"
