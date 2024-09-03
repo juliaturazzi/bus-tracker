@@ -14,9 +14,6 @@ def get_buses_data(start_time: str, end_time: str):
 
     # API query URL with the time range
     date_query = f"{BUS_API_URL}dataInicial={start_time}&dataFinal={end_time}"
-    print(f"Bus query: {date_query}")
-
     buses_data = requests.get(date_query).json()  # return data as JSON
-    print(f"Buses data len -> {len(buses_data)}")
 
     return buses_data

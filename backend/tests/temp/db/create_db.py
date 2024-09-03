@@ -68,14 +68,6 @@ class BusStopDatabase:
             (email, bus_line, stop_name, latitude, longitude, start_time, end_time),
         )
 
-        print("The following values were inserted: ")
-        print(f"[EMAIL]: {email}")
-        print(f"[LINE]: {bus_line}")
-        print(f"[NAME]: {stop_name}")
-        print(f"[LAT]: {latitude}")
-        print(f"[LONG]: {longitude}")
-        print(f"[START_TIME]: {start_time}")
-        print(f"[END_TIME]: {end_time}")
         conn.commit()
         cursor.close()
         conn.close()

@@ -6,8 +6,6 @@ from utils.get_buses_data import get_buses_data
 from utils.get_travel_time import get_travel_time
 from fastapi.middleware.cors import CORSMiddleware
 
-DEBUG = 1
-
 # initialize FastAPI app
 app = FastAPI()
 
@@ -74,7 +72,7 @@ async def get_filtered_bus_line(bus_line, start_time, end_time, bus_stop_name):
 
         for line_data in buses_data:
             if (
-                line_data["linha"] == str(bus_line)
+                str(line_data["linha"]) == str(bus_line)
                 and line_data["ordem"] not in seen_ordem
                 and not seen_ordem.add(line_data["ordem"])
             ):
@@ -96,21 +94,12 @@ async def get_filtered_bus_line(bus_line, start_time, end_time, bus_stop_name):
     else:
         filtered_bus_line = buses_data
 
-    if DEBUG:
-        print()
-        print(f"Size of buses response to plot: {len(filtered_bus_line)}")
-        print(f"data: {filtered_bus_line}")
     return filtered_bus_line
 
 
 # get bus lines information
 @app.get("/infos/")
 async def read_info(bus_line: str, start_time: str, end_time: str, bus_stop: str):
-    if DEBUG:
-        print("Type of start_time and end_time")
-        print(f"{start_time}: {type(start_time)}")
-        print(f"{end_time}: {type(end_time)}")
-
     return await get_filtered_bus_line(bus_line, start_time, end_time, bus_stop)
 
 

@@ -34,7 +34,6 @@ async def get_travel_time(bus_stop_coords, bus_info, start_time):
     if travel_time:
         return round(travel_time / 60, 2)  # travel time to minutes
     else:
-        print("No valid travel_time found.")
         return "Not found"
 
 

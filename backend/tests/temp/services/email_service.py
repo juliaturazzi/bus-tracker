@@ -34,6 +34,6 @@ def send_email(receiver_email, linha, ponto, onibus_data):
             server.starttls()
             server.login(str(EMAIL_SENDER_ALIAS), str(EMAIL_SENDER_PASSWORD))
             server.send_message(msg)
-            print(f"Email sent to {receiver_email}")
+
     except Exception as e:
-        print(f"Error: {e}")
+        print(e)
