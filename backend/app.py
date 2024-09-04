@@ -84,9 +84,7 @@ async def get_filtered_bus_line(bus_line, start_time, end_time, bus_stop_name):
                     "ordem": line_data.get("ordem"),
                 }
 
-                travel_time = await get_travel_time(
-                    bus_stop_coords, bus_info, start_time
-                )
+                travel_time = await get_travel_time(bus_stop_coords, bus_info)
 
                 bus_info["distancia"] = travel_time
                 filtered_bus_line.append(bus_info)

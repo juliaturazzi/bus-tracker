@@ -11,8 +11,8 @@ services:
     networks:
       - app-network
     depends_on:
-      - db  # Ensure the database service is up before the backend starts
-
+      - db  
+      
   frontend:
     build:
       context: ./frontend

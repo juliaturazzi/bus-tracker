@@ -9,7 +9,7 @@ TRAVEL_TIME_API_ID = os.getenv("TRAVEL_TIME_API_ID")
 TRAVEL_TIME_API_KEY = os.getenv("TRAVEL_TIME_API_KEY")
 
 
-async def get_travel_time(bus_stop_coords, bus_info, start_time):
+async def get_travel_time(bus_stop_coords, bus_info):
     sdk = TravelTimeSdk(f"{TRAVEL_TIME_API_ID}", f"{TRAVEL_TIME_API_KEY}")
 
     bus_stop_location = Location(

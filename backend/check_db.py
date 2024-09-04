@@ -33,7 +33,7 @@ async def evaluate_travel_time(stop, bus):
         "lon": stop["lon"],
     }
 
-    travel_time = await get_travel_time(bus_stop_info, bus, datetime.now())
+    travel_time = await get_travel_time(bus_stop_info, bus)
     return travel_time
 
 
