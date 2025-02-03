@@ -1,0 +1,97 @@
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:rw
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_started
+    networks:
+      - app-network
+    profiles: [caddy]
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: bustracker
+      MYSQL_USER: bustracker
+      MYSQL_PASSWORD: busTr@cker
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      - TZ=${TZ}
+      - OPENROUTE_KEY=${OPENROUTE_KEY}
+      - DATABASE_HOST=db
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+    depends_on:
+      backend:
+        condition: service_started
+    restart: on-failure
+    environment:
+      - VIRTUAL_HOST=bustracker.com.br
+      - LETSENCRYPT_HOST=bustracker.com.br
+      - LETSENCRYPT_EMAIL=juliata@dcc.ufrj.br
+    volumes:
+      - ./frontend:/app
+      # - /app/node_modules/
+
+  k6:
+    image: grafana/k6
+    container_name: k6
+    command: ["run", "/scripts/load_test.js"]
+    user: "${HOST_USER_ID:-1000}:${HOST_GROUP_ID:-1000}"
+    volumes:
+      - ./k6-load-testing/:/scripts/
+    networks:
+      - app-network
+    profiles: [k6]
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

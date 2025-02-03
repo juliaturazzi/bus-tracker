@@ -1,0 +1,46 @@
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from fastapi import HTTPException
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY") 
+SECURITY_PASSWORD_SALT = os.getenv("SECURITY_PASSWORD_SALT")  
+RESET_PASSWORD_SALT = os.getenv("RESET_PASSWORD_SALT") 
+
+def generate_verification_token(email: str) -> str:
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    return serializer.dumps(email, salt=SECURITY_PASSWORD_SALT)
+
+def confirm_verification_token(token: str, expiration: int = 3600) -> str:
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=SECURITY_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except SignatureExpired:
+        raise HTTPException(status_code=400, detail="O link de verificação expirou. Por favor, tente novamente!")
+    except BadSignature:
+        raise HTTPException(status_code=400, detail="Token de verificação inválido ou expirado.")
+    return email
+
+def generate_reset_token(email: str) -> str:
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    return serializer.dumps(email, salt=RESET_PASSWORD_SALT)
+
+def confirm_reset_token(token: str, expiration: int = 3600) -> str:
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    try:
+        email = serializer.loads(
+            token,
+            salt=RESET_PASSWORD_SALT,
+            max_age=expiration
+        )
+    except SignatureExpired:
+        raise HTTPException(status_code=400, detail="O link de redefinição de senha expirou. Por favor, tente novamente!")
+    except BadSignature:
+        raise HTTPException(status_code=400, detail="Token de redefinição de senha inválido ou expirado.")
+    return email

@@ -1,0 +1,386 @@
+import os
+import smtplib
+from dotenv import load_dotenv
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import datetime
+
+load_dotenv()
+EMAIL_SENDER_ALIAS = os.getenv("EMAIL_SENDER_ALIAS")
+EMAIL_SENDER_PASSWORD = os.getenv("EMAIL_SENDER_PASSWORD")
+WEBSITE_URL = os.getenv("WEBSITE_URL")
+
+SMTP_SERVER = "smtp.zoho.com"
+SMTP_PORT = 587
+
+
+def send_email(receiver_email, linha, ponto, onibus_data):
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bus Tracker Alertas</title>
+        <style>
+            body {{
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                background-color: #FFA844;
+                color: #ffffff;
+                text-align: center;
+                padding: 30px 20px;
+            }}
+            .header img {{
+                max-width: 30px;
+                margin-bottom: 10px;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+            }}
+            .content {{
+                padding: 20px;
+                color: #333333;
+                line-height: 1.6;
+            }}
+            .content h2 {{
+                color: #FFA844;
+                font-size: 20px;
+                margin-bottom: 15px;
+            }}
+            .content ul {{
+                padding-left: 20px;
+            }}
+            .content ul li {{
+                margin-bottom: 10px;
+            }}
+            .button-container {{
+                text-align: center;
+                margin: 20px 0;
+            }}
+            .button {{
+                background-color: #FFA844;
+                color: #ffffff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                display: inline-block;
+            }}
+            .footer {{
+                background-color: #f9f9f9;
+                color: #888888;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <!-- Header Section -->
+            <div class="header">
+                <img src="https://res.cloudinary.com/dlx31jbcz/image/upload/v1733106928/bus-icon-app_txjwpn.png" alt="App Icon" />
+                <h1>Bus Tracker</h1>
+            </div>
+            <!-- Content Section -->
+            <div class="content">
+                <h2>Atualizações sobre a sua linha:</h2>
+                <p><strong>Linha: </strong> {linha}</p>
+                <p><strong>Ponto de ônibus: </strong> {ponto}</p>
+                <h3>Informações sobre os ônibus:</h3>
+                <ul>
+                    <!-- Dynamic Bus Information List -->
+                    {''.join([f'<li>Ônibus <strong>{onibus}</strong> está a <strong>{minutos}</strong> minutos de distância do seu ponto.</li>' for onibus, minutos in onibus_data.items()])}
+                </ul>
+            </div>
+            <!-- Footer Section -->
+            <div class="footer">
+                <p>Obrigada por usar nosso aplicativo. Mantenha-se informado sobre as suas rotas!</p>
+                <p>© {datetime.date.today().year} Bus Tracker</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = EMAIL_SENDER_ALIAS
+    msg["To"] = receiver_email
+    msg["Subject"] = "Bus Tracker Updates"
+
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # Secure the connection
+            server.login(EMAIL_SENDER_ALIAS, EMAIL_SENDER_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        raise e
+
+
+def send_verification_email(receiver_email: str, token: str):
+    verification_link = f"{WEBSITE_URL}verify?token={token}"
+    subject = "Verifique seu Email - Bus Tracker"
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bus Tracker Alertas</title>
+        <style>
+            body {{
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                background-color: #FFA844;
+                color: #ffffff;
+                text-align: center;
+                padding: 30px 20px;
+            }}
+            .header img {{
+                max-width: 30px;
+                margin-bottom: 10px;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+            }}
+            .content {{
+                padding: 20px;
+                color: #333333;
+                line-height: 1.6;
+            }}
+            .content h2 {{
+                color: #FFA844;
+                font-size: 20px;
+                margin-bottom: 15px;
+            }}
+            .content ul {{
+                padding-left: 20px;
+            }}
+            .content ul li {{
+                margin-bottom: 10px;
+            }}
+            .button-container {{
+                text-align: center;
+                margin: 20px 0;
+            }}
+            .button {{
+                background-color: #FFA844;
+                color: #ffffff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                display: inline-block;
+            }}
+            .footer {{
+                background-color: #f9f9f9;
+                color: #888888;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <!-- Header Section -->
+            <div class="header">
+                <img src="https://res.cloudinary.com/dlx31jbcz/image/upload/v1733106928/bus-icon-app_txjwpn.png" alt="App Icon" />
+                <h1>Bus Tracker</h1>
+            </div>
+            <!-- Content Section -->
+            <div class="content">
+                <h2>Bem-vindo ao Bus Tracker!</h2>
+                <p>Obrigado por se registrar. Por favor, verifique seu email clicando no botão abaixo:</p>
+                <div class="button-container">
+                    <a href="{verification_link}" class="button">Verificar Email</a>
+                </div>
+                <p>Se você não se registrou, por favor ignore este email.</p>
+            </div>
+            <!-- Footer Section -->
+            <div class="footer">
+                <p>Obrigada por usar nosso aplicativo. Mantenha-se informado sobre as suas rotas!</p>
+                <p>© {datetime.date.today().year} Bus Tracker</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = EMAIL_SENDER_ALIAS
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
+
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls() 
+            server.login(EMAIL_SENDER_ALIAS, EMAIL_SENDER_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        raise e
+
+
+def send_password_reset_email(receiver_email: str, token: str):
+    reset_link = f"{WEBSITE_URL}reset-password?token={token}"
+
+    subject = "Redefina sua senha - Bus Tracker"
+
+    html_content = f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bus Tracker</title>
+        <style>
+            body {{
+                font-family: 'Helvetica Neue', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f4f4f4;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: 20px auto;
+                background-color: #ffffff;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+            .header {{
+                background-color: #FFA844;
+                color: #ffffff;
+                text-align: center;
+                padding: 30px 20px;
+            }}
+            .header img {{
+                max-width: 30px;
+                margin-bottom: 10px;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 24px;
+                font-weight: bold;
+            }}
+            .content {{
+                padding: 20px;
+                color: #333333;
+                line-height: 1.6;
+            }}
+            .content h2 {{
+                color: #FFA844;
+                font-size: 20px;
+                margin-bottom: 15px;
+            }}
+            .content ul {{
+                padding-left: 20px;
+            }}
+            .content ul li {{
+                margin-bottom: 10px;
+            }}
+            .button-container {{
+                text-align: center;
+                margin: 20px 0;
+            }}
+            .button {{
+                background-color: #FFA844;
+                color: #ffffff;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                font-weight: bold;
+                display: inline-block;
+            }}
+            .footer {{
+                background-color: #f9f9f9;
+                color: #888888;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+            }}
+        </style>
+    </head>
+        <body>
+            <div class="email-container">
+                <!-- Header Section -->
+                <div class="header">
+                <img src="https://res.cloudinary.com/dlx31jbcz/image/upload/v1733106928/bus-icon-app_txjwpn.png" alt="App Icon" />
+                <h1>Bus Tracker</h1>
+            </div>
+                <!-- Content Section -->
+                <div class="content">
+                    <h2>Redefina sua senha</h2>
+                    <p>Você informou que gostaria de redefinir a senha cadastrada no Bus Tracker. Clique no botão abaixo para gerar uma nova senha:</p>
+                    <div class="button-container">
+                        <a href="{reset_link}" class="button">Redefinir senha</a>
+                    </div>
+                    <p>Se não foi você que requisitou a mudança de senha, por favor, desconsidere este email.</p>
+                </div>
+                <!-- Footer Section -->
+                <div class="footer">
+                <p>Obrigada por usar nosso aplicativo. Mantenha-se informado sobre as suas rotas!</p>
+                <p>© {datetime.date.today().year} Bus Tracker</p>
+            </div>
+            </div>
+        </body>
+        </html>
+        """
+
+    msg = MIMEMultipart("alternative")
+    msg["From"] = EMAIL_SENDER_ALIAS
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
+
+    msg.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.starttls()  # Secure the connection
+            server.login(EMAIL_SENDER_ALIAS, EMAIL_SENDER_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        raise
+
+
+if __name__ == "__main__":
+    receiver = "recipient@example.com"
+    linha = "42B"
+    ponto = "Central Station"
+    onibus_data = {"Bus 1": 5, "Bus 2": 12, "Bus 3": 7}
+
+    send_email(receiver, linha, ponto, onibus_data)
